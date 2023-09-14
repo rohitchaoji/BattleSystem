@@ -281,6 +281,8 @@ class Radar : BattleSystemClass
         Velocities = velocities;
         VehicleHasStopped = false;
         RadarRange = radar_range;
+        NextWaypoint = new float[] { 0.0f, 0.0f };
+        LegVelocity = new float[] { 0.0f, 0.0f };
         MissileRange = 0;
         Type = "Radar";
         InLeg = 0;
@@ -360,10 +362,10 @@ class AntiAir : BattleSystemClass
         VehiclePath = waypoints;
         Velocities = velocities;
         VehicleHasStopped = false;
-        LegVelocity[0] = 0.0f;
-        LegVelocity[1] = 0.0f;
         RadarRange = radar_range;
         MissileRange = radar_range;
+        NextWaypoint = new float[] { 0.0f, 0.0f };
+        LegVelocity = new float[] { 0.0f, 0.0f };
         Type = "AntiAir";
         InLeg = 0;
         CurrWaypointID = 0;
