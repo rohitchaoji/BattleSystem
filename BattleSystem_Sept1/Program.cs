@@ -1,4 +1,4 @@
-﻿namespace BattleSystem
+namespace BattleSystem
 {
     class Program
     {
@@ -15,30 +15,48 @@
                                                          new float[] { 10.0f, 7.5f },
                                                          new float[] { 15.0f, 5.0f },
                                                          new float[] { 10.0f, 2.5f },
-                                                         new float[] { 5.0f, 2.5f } },
+                                                         new float[] { 5.0f, 2.5f },
+                                                         new float[] { 0.0f, 0.0f } },
 
                                                          // Velocities
 
-                                                         new float[] { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f }, 7.5f));
+                                                         1.0f , 10.0f));
 
             SimEng.RegisterVehicle(new Radar(new List<float[]>
                                                         {new float[] { 10.0f, 5.0f }},
-                                                         new float[] { 0.0f }, 7.5f));
+                                                         0.0f, 10.0f));
 
             SimEng.RegisterVehicle(new Radar(new List<float[]>
                                                         {new float[] { 15.0f, 7.5f }},
-                                                         new float[] { 0.0f }, 7.5f));
+                                                         0.0f, 10.0f));
 
-            SimEng.RegisterVehicle(new Radar(new List<float[]>
-                                                        {new float[] { 20.0f, 3.5f }},
-                                                         new float[] { 0.0f }, 7.5f));
+            /*            SimEng.RegisterVehicle(new Aircraft(new List<float[]>
+                                                                    {
+                                                                     // Waypoints
 
+                                                                     new float[] { -20.0f, 5.0f },
+                                                                     new float[] { 50.0f, 5.0f } },
+
+                                                                     // Velocities
+
+                                                                     new float[] { 1.0f }, 10.0f));
+
+                        SimEng.RegisterVehicle(new Aircraft(new List<float[]>
+                                                                    {
+                                                                     // Waypoints
+
+                                                                     new float[] { -40.0f, 5.0f },
+                                                                     new float[] { 50.0f, 5.0f } },
+
+                                                         // Velocities
+
+                                                                     new float[] { 1.0f }, 10.0f));
+
+                        SimEng.RegisterVehicle(new Radar(new List<float[]> { new float[] { 45.0f, 0.0f } }, new float[] { 0.0f }, 10.0f));
+                        SimEng.RegisterVehicle(new AntiAir(new List<float[]> { new float[] { 25.0f, 0.0f } }, new float[] { 0.0f }, 10.0f));*/
 
             float acc_zone_size = 3.0f;
             float att_zone_size = 1.5f;
-
-            // Above two variables are only applicable for Anti-Aircraft simulation
-
             while (!SimEng.allVehiclesStopped)
             {
 
@@ -59,15 +77,18 @@
     }
 }
 
+
 abstract class BattleSystemClass
 {
     public abstract string Type { get; set; }
     public abstract int VehicleID { get; set; }
     public abstract List<float[]> VehiclePath { get; set; }
-    public abstract List<float[]> LegVelocity { get; set; }
-    public abstract float[] Velocities { get; set; }
+    public abstract float[] LegVelocity { get; set; }
+    public abstract float Velocities { get; set; }
     public abstract float[] CurrentPosition { get; set; }
     public abstract float[] NewPositionTemp { get; set; }
+    public abstract float[] NextWaypoint { get; set; }
+    public abstract int CurrWaypointID { get; set; }
     public abstract int InLeg { get; set; }
     public abstract bool VehicleHasStopped { get; set; }
     public abstract bool VelocityChanged { get; set; }
@@ -80,6 +101,7 @@ abstract class BattleSystemClass
     public abstract float[] Get();
     public abstract void Set(BattleSystemClass batt_class, string add_rem);
     public abstract void OnTick(float timer);
+    public abstract void DecompVelocity();
 }
 
 class Aircraft : BattleSystemClass
@@ -87,10 +109,12 @@ class Aircraft : BattleSystemClass
     public override string Type { get; set; }
     public override int VehicleID { get; set; }
     public override List<float[]> VehiclePath { get; set; }
-    public override List<float[]> LegVelocity { get; set; }
-    public override float[] Velocities { get; set; }
+    public override float[] LegVelocity { get; set; }
+    public override float Velocities { get; set; }
     public override float[] CurrentPosition { get; set; }
     public override float[] NewPositionTemp { get; set; }
+    public override float[] NextWaypoint { get; set; }
+    public override int CurrWaypointID { get; set; }
     public override int InLeg { get; set; }
     public override bool VehicleHasStopped { get; set; }
     public override bool VelocityChanged { get; set; }
@@ -111,8 +135,8 @@ class Aircraft : BattleSystemClass
         // Compute new positions
         if (!VehicleHasStopped)
         {
-            NewPositionTemp[0] = CurrentPosition[0] + (LegVelocity[InLeg][0] * timer);
-            NewPositionTemp[1] = CurrentPosition[1] + (LegVelocity[InLeg][1] * timer);
+            NewPositionTemp[0] = CurrentPosition[0] + (LegVelocity[0] * timer);
+            NewPositionTemp[1] = CurrentPosition[1] + (LegVelocity[1] * timer);
         }
     }
     public override void Set(BattleSystemClass batt_class, string add_rem)
@@ -141,7 +165,28 @@ class Aircraft : BattleSystemClass
             }
         }
     }
-    public Aircraft(List<float[]> waypoints, float[] velocities, float radar_range)
+
+    public float DistanceCalculator(float[] obj1, float[] obj2)
+    {
+        float x = (obj1[0] - obj2[0]);
+        float y = (obj1[1] - obj2[1]);
+        return MathF.Sqrt((x * x) + (y * y));
+    }
+
+    public float AngleCalculator(float[] obj1, float[] obj2)
+    {
+        float x = (obj2[0] - obj1[0]);
+        float y = (obj2[1] - obj1[1]);
+        float v = MathF.Atan2(y, x);
+        return v;
+    }
+
+    public override void DecompVelocity()
+    {
+        this.LegVelocity[0] = this.Velocities * MathF.Cos(AngleCalculator(this.CurrentPosition, this.NextWaypoint));
+        this.LegVelocity[1] = this.Velocities * MathF.Sin(AngleCalculator(this.CurrentPosition, this.NextWaypoint));
+    }
+    public Aircraft(List<float[]> waypoints, float velocities, float radar_range)
     {
 
         // Object of Aircraft class takes a List of waypoints (float array of size 2), an array of velocities (size = waypoint list size - 1)
@@ -152,8 +197,8 @@ class Aircraft : BattleSystemClass
         VehiclePath = waypoints;
         Velocities = velocities;
         VehicleHasStopped = false;
-        LegVelocity = new List<float[]>();
         RadarRange = radar_range;
+        NextWaypoint = VehiclePath[1];
         Type = "Aircraft";
         BattleSOS.s_AircraftID++;
         VehicleID = BattleSOS.s_AircraftID;
@@ -161,22 +206,10 @@ class Aircraft : BattleSystemClass
         ObjAngle = 0.0f;
         ObjDist = 0.0f;
         InLeg = 0;
-
+        CurrWaypointID = 0;
+        LegVelocity = new float[2];
+        DecompVelocity();
         // Velocities are in direction of any given waypoint leg, decomposing velocities into Vx and Vy
-
-        for (int i = 0; i < velocities.Length; i++)
-        {
-            float x_len;
-            float y_len;
-            float euclidean_distance;
-            float[] leg_vel = new float[2];
-            x_len = VehiclePath[i + 1][0] - VehiclePath[i][0]; // x2 - x1
-            y_len = VehiclePath[i + 1][1] - VehiclePath[i][1]; // y2 - y1
-            euclidean_distance = MathF.Sqrt((x_len * x_len) + (y_len * y_len)); // Euclidean distance or Absolute vector distance
-            leg_vel[0] = Velocities[i] * (x_len / euclidean_distance); // Vx = V * cos(angle)
-            leg_vel[1] = Velocities[i] * (y_len / euclidean_distance); // Vy = V * sin(angle)
-            LegVelocity.Add(leg_vel);
-        }
     }
 }
 
@@ -185,10 +218,12 @@ class Radar : BattleSystemClass
     public override string Type { get; set; }
     public override int VehicleID { get; set; }
     public override List<float[]> VehiclePath { get; set; }
-    public override List<float[]> LegVelocity { get; set; }
-    public override float[] Velocities { get; set; }
+    public override float[] LegVelocity { get; set; }
+    public override float Velocities { get; set; }
     public override float[] CurrentPosition { get; set; }
     public override float[] NewPositionTemp { get; set; }
+    public override float[] NextWaypoint { get; set; }
+    public override int CurrWaypointID { get; set; }
     public override int InLeg { get; set; }
     public override bool VehicleHasStopped { get; set; }
     public override bool VelocityChanged { get; set; }
@@ -228,7 +263,12 @@ class Radar : BattleSystemClass
             }
         }
     }
-    public Radar(List<float[]> waypoints, float[] velocities, float radar_range)
+
+    public override void DecompVelocity()
+    {
+
+    }
+    public Radar(List<float[]> waypoints, float velocities, float radar_range)
     {
 
         // Object of Radar class takes the same arguments as Aircraft, but the List of waypoints only contains one item
@@ -240,15 +280,14 @@ class Radar : BattleSystemClass
         VehiclePath = waypoints;
         Velocities = velocities;
         VehicleHasStopped = false;
-        LegVelocity = new List<float[]>();
         RadarRange = radar_range;
         MissileRange = 0;
         Type = "Radar";
         InLeg = 0;
+        CurrWaypointID = 0;
         ObjectsVisible = new List<BattleSystemClass>();
         BattleSOS.s_RadarID++;
         VehicleID = BattleSOS.s_RadarID;
-        LegVelocity.Add(new float[] { 0.0f, 0.0f });
         ObjAngle = 0.0f;
         ObjDist = 0.0f;
     }
@@ -259,10 +298,12 @@ class AntiAir : BattleSystemClass
     public override string Type { get; set; }
     public override int VehicleID { get; set; }
     public override List<float[]> VehiclePath { get; set; }
-    public override List<float[]> LegVelocity { get; set; }
-    public override float[] Velocities { get; set; }
+    public override float[] LegVelocity { get; set; }
+    public override float Velocities { get; set; }
     public override float[] CurrentPosition { get; set; }
     public override float[] NewPositionTemp { get; set; }
+    public override float[] NextWaypoint { get; set; }
+    public override int CurrWaypointID { get; set; }
     public override int InLeg { get; set; }
     public override bool VehicleHasStopped { get; set; }
     public override bool VelocityChanged { get; set; }
@@ -302,7 +343,12 @@ class AntiAir : BattleSystemClass
             }
         }
     }
-    public AntiAir(List<float[]> waypoints, float[] velocities, float radar_range)
+
+    public override void DecompVelocity()
+    {
+
+    }
+    public AntiAir(List<float[]> waypoints, float velocities, float radar_range)
     {
 
         // Object of Radar class takes the same arguments as Aircraft, but the List of waypoints only contains one item
@@ -314,15 +360,16 @@ class AntiAir : BattleSystemClass
         VehiclePath = waypoints;
         Velocities = velocities;
         VehicleHasStopped = false;
-        LegVelocity = new List<float[]>();
+        LegVelocity[0] = 0.0f;
+        LegVelocity[1] = 0.0f;
         RadarRange = radar_range;
         MissileRange = radar_range;
         Type = "AntiAir";
         InLeg = 0;
+        CurrWaypointID = 0;
         ObjectsVisible = new List<BattleSystemClass>();
         BattleSOS.s_AntiAirID++;
         VehicleID = BattleSOS.s_AntiAirID;
-        LegVelocity.Add(new float[] { 0.0f, 0.0f });
         ObjAngle = 0.0f;
         ObjDist = 0.0f;
     }
@@ -352,18 +399,17 @@ class SimulationEngine
 
     public float DistanceCalculator(float[] obj1, float[] obj2)
     {
-        float x = MathF.Abs(obj1[0] - obj2[0]);
-        float y = MathF.Abs(obj1[1] - obj2[1]);
+        float x = (obj1[0] - obj2[0]);
+        float y = (obj1[1] - obj2[1]);
         return MathF.Sqrt((x * x) + (y * y));
     }
 
     public float AngleCalculator(float[] obj1, float[] obj2)
     {
-        float x = (obj1[0] - obj2[0]);
-        float y = (obj1[1] - obj2[1]);
-        float pi = MathF.PI;
-        float v = MathF.Atan2(y, x) * (180 / pi);
-        return MathF.Abs(v);
+        float x = (obj2[0] - obj1[0]);
+        float y = (obj2[1] - obj1[1]);
+        float v = MathF.Atan2(y, x);
+        return v;
     }
 
     public void RegisterVehicle(BattleSystemClass newVehicle)
@@ -434,30 +480,33 @@ class SimulationEngine
                 {
                     float obj_dist = DistanceCalculator(veh.CurrentPosition, vehicle.CurrentPosition);
                     float obj_angle = AngleCalculator(veh.CurrentPosition, vehicle.CurrentPosition);
-                    Console.WriteLine($"{veh.Type} {veh.VehicleID} (Distance = {obj_dist}), (Angle = {obj_angle} degrees)");
+                    Console.WriteLine($"{veh.Type} {veh.VehicleID} (Distance = {obj_dist}), (Angle = {obj_angle} radians)");
                 }
             }
 
             if (vehicle.Type != "Radar" || vehicle.Type != "AntiAir")
             {
+                vehicle.DecompVelocity();
 
                 // Excludes Radar type object from Leg computation to avoid IndexOutOfRange runtime exception.
 
-
-
                 for (int i = 0; i < vehicle.VehiclePath.Count - 1; i++)
                 {
-
-                    if ((MathF.Abs(vehicle.CurrentPosition[0] - vehicle.VehiclePath[i + 1][0]) <= (vehicle.Velocities[i] * timer))
-                        && (MathF.Abs(vehicle.CurrentPosition[1] - vehicle.VehiclePath[i + 1][1]) <= (vehicle.Velocities[i] * timer)))
+                    if ((MathF.Abs(DistanceCalculator(vehicle.CurrentPosition, vehicle.NextWaypoint)) <= (vehicle.Velocities * timer)))
                     {
-                        if (!vehicle.VehicleHasStopped)
+                        if (!vehicle.VehicleHasStopped || vehicle.NextWaypoint != vehicle.VehiclePath.Last())
                         {
-                            vehicle.InLeg = i + 1;
-                            if (vehicle.InLeg == vehicle.Velocities.Length)
+                            vehicle.CurrWaypointID++;
+                            Console.WriteLine("Waypoint changed");
+                            if (vehicle.CurrWaypointID < vehicle.VehiclePath.Count)
+                            {
+                                vehicle.NextWaypoint = vehicle.VehiclePath[vehicle.CurrWaypointID];
+                            }
+                            else if (vehicle.CurrWaypointID == vehicle.VehiclePath.Count)
                             {
                                 vehicle.VehicleHasStopped = true;
                             }
+                            Console.WriteLine($"Next waypoint = ({vehicle.NextWaypoint[0]}, {vehicle.NextWaypoint[1]})");
                         }
                     }
 
@@ -479,8 +528,7 @@ class SimulationEngine
                 vehicle.Set(vehicle, "");
                 Console.WriteLine($"\n{vehicle.Type} {vehicle.VehicleID}");
                 Console.WriteLine($"(x, y) = ({vehicle.CurrentPosition[0]},{vehicle.CurrentPosition[1]})" +
-                                  $"\n(Vx, Vy) = {vehicle.LegVelocity[vehicle.InLeg][0]},{vehicle.LegVelocity[vehicle.InLeg][1]}" +
-                                  $" in leg {vehicle.InLeg}");
+                                  $"\n(Vx, Vy) = {vehicle.LegVelocity[0]},{vehicle.LegVelocity[1]}");
             }
             if (vehicle.VehicleHasStopped)
             {
@@ -506,7 +554,6 @@ class SimulationEngine
         {
 
             // Compute values for new position and objects within Radar range.
-
             vehicle.OnTick(timer);
             if (vehicle.Type == "AntiAir")
             {
@@ -529,7 +576,7 @@ class SimulationEngine
 
                                 Console.WriteLine($"{other_vehicle.Type} {other_vehicle.VehicleID} was hit");
                                 ThreatDetected = true;
-                                FirstVelocity = other_vehicle.Velocities[other_vehicle.InLeg];
+                                FirstVelocity = other_vehicle.Velocities;
                                 UnsafePosition = FirstUnsafePos = other_vehicle.CurrentPosition;
                                 BattleSOS.BattleSysList.Remove(other_vehicle);
                             }
@@ -547,14 +594,14 @@ class SimulationEngine
 
                                 // When aircraft is within a certain radius of the danger zone, it must change its speed
 
-                                if (other_vehicle.InLeg < other_vehicle.Velocities.Length && !other_vehicle.VelocityChanged)
+                                if (other_vehicle.NextWaypoint != other_vehicle.VehiclePath.Last() && !other_vehicle.VelocityChanged)
                                 {
                                     float FirstLegVel_x;
                                     float x_to_next_leg = MathF.Abs(other_vehicle.CurrentPosition[0] - other_vehicle.VehiclePath[other_vehicle.InLeg + 1][0]);
                                     float dist_to_next_leg = DistanceCalculator(other_vehicle.CurrentPosition, other_vehicle.VehiclePath[other_vehicle.InLeg + 1]);
                                     float cosine = x_to_next_leg / dist_to_next_leg;
-                                    FirstLegVel_x = other_vehicle.Velocities[other_vehicle.InLeg] * cosine;
-                                    other_vehicle.LegVelocity[other_vehicle.InLeg][0] = (MathF.Abs(UnsafePosition[0]) + danger_zone_dist_total) * (FirstLegVel_x / FirstUnsafePos[0]);
+                                    FirstLegVel_x = other_vehicle.Velocities * cosine;
+                                    other_vehicle.LegVelocity[0] = (MathF.Abs(UnsafePosition[0]) + danger_zone_dist_total) * (FirstLegVel_x / FirstUnsafePos[0]);
                                     other_vehicle.VelocityChanged = true;
                                 }
                                 if (dist_total <= vehicle.MissileRange)
@@ -595,4 +642,3 @@ class SimulationEngine
         }
     }
 }
-
