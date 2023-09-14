@@ -1,0 +1,6 @@
+Variables found:
+
+1. Danger zone size
+2. At what point does aircraft accelerate
+3. How much to speed up by (calculated using analysis)
+4. Time T for missile to reach target
