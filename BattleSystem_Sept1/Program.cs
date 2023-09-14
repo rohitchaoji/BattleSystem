@@ -149,15 +149,15 @@ class Aircraft : BattleSystemClass
 
     public float DistanceCalculator(float[] obj1, float[] obj2)
     {
-        float x = (obj1[0] - obj2[0]);
-        float y = (obj1[1] - obj2[1]);
+        float x = obj1[0] - obj2[0];
+        float y = obj1[1] - obj2[1];
         return MathF.Sqrt((x * x) + (y * y));
     }
 
     public float AngleCalculator(float[] obj1, float[] obj2)
     {
-        float x = (obj2[0] - obj1[0]);
-        float y = (obj2[1] - obj1[1]);
+        float x = obj2[0] - obj1[0];
+        float y = obj2[1] - obj1[1];
         float v = MathF.Atan2(y, x);
         return v;
     }
@@ -382,15 +382,15 @@ class SimulationEngine
 
     public float DistanceCalculator(float[] obj1, float[] obj2)
     {
-        float x = (obj1[0] - obj2[0]);
-        float y = (obj1[1] - obj2[1]);
+        float x = obj1[0] - obj2[0];
+        float y = obj1[1] - obj2[1];
         return MathF.Sqrt((x * x) + (y * y));
     }
 
     public float AngleCalculator(float[] obj1, float[] obj2)
     {
-        float x = (obj2[0] - obj1[0]);
-        float y = (obj2[1] - obj1[1]);
+        float x = obj2[0] - obj1[0];
+        float y = obj2[1] - obj1[1];
         float v = MathF.Atan2(y, x);
         return v;
     }
@@ -479,12 +479,11 @@ class SimulationEngine
 
                 for (int i = 0; i < vehicle.VehiclePath.Count - 1; i++)
                 {
-                    if ((MathF.Abs(DistanceCalculator(vehicle.CurrentPosition, vehicle.NextWaypoint)) <= (vehicle.Velocities * timer)))
+                    if (MathF.Abs(DistanceCalculator(vehicle.CurrentPosition, vehicle.NextWaypoint)) <= (vehicle.Velocities * timer))
                     {
                         if (!vehicle.VehicleHasStopped || vehicle.NextWaypoint != vehicle.VehiclePath.Last())
                         {
                             vehicle.CurrWaypointID++;
-                            Console.WriteLine("Waypoint changed");
                             if (vehicle.CurrWaypointID < vehicle.VehiclePath.Count)
                             {
                                 vehicle.NextWaypoint = vehicle.VehiclePath[vehicle.CurrWaypointID];
@@ -493,7 +492,6 @@ class SimulationEngine
                             {
                                 vehicle.VehicleHasStopped = true;
                             }
-                            Console.WriteLine($"Next waypoint = ({vehicle.NextWaypoint[0]}, {vehicle.NextWaypoint[1]})");
                         }
                     }
 
