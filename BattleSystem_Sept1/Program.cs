@@ -459,11 +459,15 @@ class SimulationEngine
 
                 }
                 Console.WriteLine($"\nObjects visible to {vehicle.Type} {vehicle.VehicleID}:");
+                if (vehicle.ObjectsVisible.Count == 0)
+                {
+                    Console.WriteLine("None");
+                }
                 foreach (var veh in vehicle.ObjectsVisible)
                 {
                     float obj_dist = DistanceCalculator(veh.CurrentPosition, vehicle.CurrentPosition);
                     float obj_angle = AngleCalculator(veh.CurrentPosition, vehicle.CurrentPosition);
-                    Console.WriteLine($"{veh.Type} {veh.VehicleID} (Distance = {obj_dist}), (Angle = {obj_angle} radians)");
+                    Console.WriteLine($"{veh.Type} {veh.VehicleID} (Distance = {obj_dist}), (Angle = {Math.Abs(obj_angle)} radians)");
                 }
             }
 
