@@ -465,9 +465,9 @@ class SimulationEngine
                 }
                 foreach (var veh in vehicle.ObjectsVisible)
                 {
-                    float obj_dist = DistanceCalculator(veh.CurrentPosition, vehicle.CurrentPosition);
-                    float obj_angle = AngleCalculator(veh.CurrentPosition, vehicle.CurrentPosition);
-                    Console.WriteLine($"{veh.Type} {veh.VehicleID} (Distance = {obj_dist}), (Angle = {Math.Abs(obj_angle)} radians)");
+                    float obj_dist = DistanceCalculator(vehicle.CurrentPosition, veh.CurrentPosition);
+                    float obj_angle = AngleCalculator(vehicle.CurrentPosition, veh.CurrentPosition);
+                    Console.WriteLine($"{veh.Type} {veh.VehicleID} (Distance = {obj_dist}), (Angle = {Math.Abs(obj_angle) * (180 / MathF.PI)} degrees)");
                 }
             }
 
