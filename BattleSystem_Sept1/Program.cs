@@ -20,7 +20,7 @@ namespace BattleSystem
 
                                                          // Velocities
 
-                                                         1.0f , 7.5f));
+                                                         1.0f, 7.5f));
 
             SimEng.RegisterVehicle(new Radar(new List<float[]>
                                                         {new float[] { 15.0f, 10.0f }},
@@ -423,15 +423,15 @@ class SimulationEngine
 
         // Set size of globalSituationalAwareness based on number of Radars and Aircraft in BattleSOS
 
-/*        string[,] globalSituationalAwareness = new string[num_radars, num_aircraft];
+        /*        string[,] globalSituationalAwareness = new string[num_radars, num_aircraft];
 
-        for (int i = 0; i < num_radars; i++)
-        {
-            for (int j = 0; j < num_aircraft; j++)
-            {
-                globalSituationalAwareness[i, j] = "-";
-            }
-        }*/
+                for (int i = 0; i < num_radars; i++)
+                {
+                    for (int j = 0; j < num_aircraft; j++)
+                    {
+                        globalSituationalAwareness[i, j] = "-";
+                    }
+                }*/
 
 
         // EXECUTE Set() method on every vehicle on field
@@ -618,14 +618,14 @@ class SimulationEngine
 
         }
 
-/*        Console.WriteLine("Global situational awareness matrix:");
-        for (int n = 0; n < num_radars; n++)
-        {
-            for (int m = 0; m < num_aircraft; m++)
-            {
-                Console.Write($"{globalSituationalAwareness[n, m]} ");
-            }
-            Console.WriteLine("");
-        }*/
+        /*        Console.WriteLine("Global situational awareness matrix:");
+                for (int n = 0; n < num_radars; n++)
+                {
+                    for (int m = 0; m < num_aircraft; m++)
+                    {
+                        Console.Write($"{globalSituationalAwareness[n, m]} ");
+                    }
+                    Console.WriteLine("");
+                }*/
     }
 }
