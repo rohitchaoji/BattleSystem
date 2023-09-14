@@ -10,53 +10,34 @@ namespace BattleSystem
                                                         {
                                                          // Waypoints
 
-                                                         new float[] { 0.0f, 0.0f },
                                                          new float[] { 5.0f, 5.0f },
-                                                         new float[] { 10.0f, 7.5f },
-                                                         new float[] { 15.0f, 5.0f },
-                                                         new float[] { 10.0f, 2.5f },
-                                                         new float[] { 5.0f, 2.5f },
-                                                         new float[] { 0.0f, 0.0f } },
+                                                         new float[] { 10.0f, 10.0f },
+                                                         new float[] { 15.0f, 10.0f },
+                                                         new float[] { 20.0f, 5.0f },
+                                                         new float[] { 15.0f, 0.0f },
+                                                         new float[] { 10.0f, 0.0f },
+                                                         new float[] { 5.0f, 5.0f }, },
 
                                                          // Velocities
 
-                                                         1.0f , 10.0f));
+                                                         1.0f , 7.5f));
 
             SimEng.RegisterVehicle(new Radar(new List<float[]>
-                                                        {new float[] { 10.0f, 5.0f }},
-                                                         0.0f, 10.0f));
+                                                        {new float[] { 15.0f, 10.0f }},
+                                                         0.0f, 7.5f));
 
             SimEng.RegisterVehicle(new Radar(new List<float[]>
-                                                        {new float[] { 15.0f, 7.5f }},
-                                                         0.0f, 10.0f));
+                                                        {new float[] { 25.0f, 5.0f }},
+                                                         0.0f, 7.5f));
 
-            /*            SimEng.RegisterVehicle(new Aircraft(new List<float[]>
-                                                                    {
-                                                                     // Waypoints
+            SimEng.RegisterVehicle(new Radar(new List<float[]>
+                                                        {new float[] { 15.0f, 0.0f }},
+                                                         0.0f, 7.5f));
 
-                                                                     new float[] { -20.0f, 5.0f },
-                                                                     new float[] { 50.0f, 5.0f } },
 
-                                                                     // Velocities
+            float acc_zone_size = 3.0f; // Used for calculations relevant to anti-aircraft
+            float att_zone_size = 1.5f; // Used for calculations relevant to anti-aircraft
 
-                                                                     new float[] { 1.0f }, 10.0f));
-
-                        SimEng.RegisterVehicle(new Aircraft(new List<float[]>
-                                                                    {
-                                                                     // Waypoints
-
-                                                                     new float[] { -40.0f, 5.0f },
-                                                                     new float[] { 50.0f, 5.0f } },
-
-                                                         // Velocities
-
-                                                                     new float[] { 1.0f }, 10.0f));
-
-                        SimEng.RegisterVehicle(new Radar(new List<float[]> { new float[] { 45.0f, 0.0f } }, new float[] { 0.0f }, 10.0f));
-                        SimEng.RegisterVehicle(new AntiAir(new List<float[]> { new float[] { 25.0f, 0.0f } }, new float[] { 0.0f }, 10.0f));*/
-
-            float acc_zone_size = 3.0f;
-            float att_zone_size = 1.5f;
             while (!SimEng.allVehiclesStopped)
             {
 
