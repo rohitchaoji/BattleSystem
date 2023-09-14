@@ -423,7 +423,7 @@ class SimulationEngine
 
         // Set size of globalSituationalAwareness based on number of Radars and Aircraft in BattleSOS
 
-        string[,] globalSituationalAwareness = new string[num_radars, num_aircraft];
+/*        string[,] globalSituationalAwareness = new string[num_radars, num_aircraft];
 
         for (int i = 0; i < num_radars; i++)
         {
@@ -431,7 +431,7 @@ class SimulationEngine
             {
                 globalSituationalAwareness[i, j] = "-";
             }
-        }
+        }*/
 
 
         // EXECUTE Set() method on every vehicle on field
@@ -618,7 +618,7 @@ class SimulationEngine
 
         }
 
-        Console.WriteLine("Global situational awareness matrix:");
+/*        Console.WriteLine("Global situational awareness matrix:");
         for (int n = 0; n < num_radars; n++)
         {
             for (int m = 0; m < num_aircraft; m++)
@@ -626,6 +626,6 @@ class SimulationEngine
                 Console.Write($"{globalSituationalAwareness[n, m]} ");
             }
             Console.WriteLine("");
-        }
+        }*/
     }
 }
