@@ -458,17 +458,7 @@ class SimulationEngine
 
 
                 }
-                Console.WriteLine($"\nObjects visible to {vehicle.Type} {vehicle.VehicleID}:");
-                if (vehicle.ObjectsVisible.Count == 0)
-                {
-                    Console.WriteLine("None");
-                }
-                foreach (var veh in vehicle.ObjectsVisible)
-                {
-                    float obj_dist = DistanceCalculator(vehicle.CurrentPosition, veh.CurrentPosition);
-                    float obj_angle = AngleCalculator(vehicle.CurrentPosition, veh.CurrentPosition);
-                    Console.WriteLine($"{veh.Type} {veh.VehicleID} (Distance = {obj_dist}), (Angle = {Math.Abs(obj_angle) * (180 / MathF.PI)} degrees)");
-                }
+
             }
 
             if (vehicle.Type != "Radar" || vehicle.Type != "AntiAir")
@@ -612,6 +602,17 @@ class SimulationEngine
                         }
                     }
                 }
+            }
+            Console.WriteLine($"\nObjects visible to {vehicle.Type} {vehicle.VehicleID}:");
+            if (vehicle.ObjectsVisible.Count == 0)
+            {
+                Console.WriteLine("None");
+            }
+            foreach (var veh in vehicle.ObjectsVisible)
+            {
+                float obj_dist = DistanceCalculator(vehicle.CurrentPosition, veh.CurrentPosition);
+                float obj_angle = AngleCalculator(vehicle.CurrentPosition, veh.CurrentPosition);
+                Console.WriteLine($"{veh.Type} {veh.VehicleID} (Distance = {obj_dist}), (Angle = {Math.Abs(obj_angle) * (180 / MathF.PI)} degrees)");
             }
 
         }
